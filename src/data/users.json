@@ -1,0 +1,43 @@
+{
+  "users": [
+    {
+      "id": "user_1",
+      "username": "subhan",
+      "email": "subhan@example.com",
+      "password": "password123",
+      "fullName": "Subhan Amjad",
+      "role": "intern",
+      "joinDate": "2025-07-28",
+      "avatar": "👨‍💻",
+      "department": "Frontend Development",
+      "mentor": "John Doe",
+      "status": "active"
+    },
+    {
+      "id": "user_2",
+      "username": "ahmed",
+      "email": "ahmed@example.com",
+      "password": "password123",
+      "fullName": "Ahmed Khan",
+      "role": "intern",
+      "joinDate": "2025-08-01",
+      "avatar": "👨‍🎓",
+      "department": "Full Stack Development",
+      "mentor": "Jane Smith",
+      "status": "active"
+    },
+    {
+      "id": "user_3",
+      "username": "fatima",
+      "email": "fatima@example.com",
+      "password": "password123",
+      "fullName": "Fatima Ali",
+      "role": "intern",
+      "joinDate": "2025-08-05",
+      "avatar": "👩‍💻",
+      "department": "Backend Development",
+      "mentor": "Mike Johnson",
+      "status": "active"
+    }
+  ]
+}

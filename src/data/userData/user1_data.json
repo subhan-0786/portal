@@ -1,0 +1,123 @@
+{
+  "userId": "user_1",
+  "leetcode": [
+    {
+      "date": "Day 1 - August 12, 2025",
+      "problems": [
+        {
+          "name": "1. Two Sum",
+          "file": "1-TwoSum.js"
+        },
+        {
+          "name": "9. Palindrome Number",
+          "file": "9-PalindromeNumber.js"
+        }
+      ]
+    },
+    {
+      "date": "Day 2 - August 13, 2025",
+      "problems": [
+        {
+          "name": "13. Roman to Integer",
+          "file": "13-RomanToInteger.js"
+        },
+        {
+          "name": "14. Longest Common Prefix",
+          "file": "14-LongestCommonPrefix.js"
+        },
+        {
+          "name": "20. Valid Parentheses",
+          "file": "20-ValidParentheses.js"
+        }
+      ]
+    }
+  ],
+  "learning": [
+    {
+      "day": "Day 1",
+      "date": "August 11, 2025",
+      "topics": [
+        "React Introduction & Installation",
+        "Create React App",
+        "Understanding JSX",
+        "Components Basics"
+      ]
+    },
+    {
+      "day": "Day 2",
+      "date": "August 12, 2025",
+      "topics": [
+        "Props in React",
+        "State Management",
+        "Event Handling",
+        "Conditional Rendering"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "BuildCorp Dashboard",
+      "description": "A comprehensive construction company dashboard built with vanilla HTML, CSS, and JavaScript featuring responsive design and interactive components.",
+      "techStack": ["HTML5", "CSS3", "JavaScript", "Responsive Design"],
+      "linkType": "demo",
+      "link": "./dashboard.html",
+      "linkText": "View Demo",
+      "status": "completed",
+      "completedDate": "2025-08-10"
+    },
+    {
+      "title": "Currency Converter",
+      "description": "A React-based currency converter with real-time exchange rates and modern UI design.",
+      "techStack": ["React", "JavaScript", "CSS3", "API Integration"],
+      "linkType": "github",
+      "link": "https://github.com/subhan-0786/currency-converter",
+      "linkText": "View Code",
+      "status": "completed",
+      "completedDate": "2025-08-15"
+    },
+    {
+      "title": "Background Color Changer",
+      "description": "Interactive React app that changes background colors with smooth transitions and color palette selection.",
+      "techStack": ["React", "CSS3", "JavaScript"],
+      "linkType": "demo",
+      "link": "./bg-changer.html",
+      "linkText": "Try Demo",
+      "status": "completed",
+      "completedDate": "2025-08-14"
+    }
+  ],
+  "overview": [
+    {
+      "weekTitle": "Week 1: JavaScript Fundamentals",
+      "weekPeriod": "July 28 - August 1, 2025",
+      "achievements": [
+        "✅ Completed JavaScript fundamentals from \"JS Learn Everything\" playlist",
+        "📄 Weekend Assignment: Object and Array Destructuring (PDF submitted)"
+      ]
+    },
+    {
+      "weekTitle": "Week 2: Advanced JavaScript",
+      "weekPeriod": "August 4 - August 8, 2025",
+      "achievements": [
+        "🎯 Completed Namaste JavaScript Season 1 & 2 (5 days)",
+        "📚 Submitted handwritten notes PDF",
+        "🏗️ Weekend Project: BuildCorp Dashboard (HTML, CSS, JS)"
+      ]
+    },
+    {
+      "weekTitle": "Week 3: React Learning Journey",
+      "weekPeriod": "August 11 - August 15, 2025",
+      "achievements": [
+        "⚛️ Started \"Chai aur React\" playlist",
+        "🎬 Watched 29 videos covering React fundamentals to deployment",
+        "🛠️ Built multiple projects including bgChanger, currency converter, and more"
+      ]
+    }
+  ],
+  "stats": {
+    "daysOfLeetCode": 11,
+    "problemsSolved": 30,
+    "weeksCompleted": 3,
+    "projectsCompleted": 3
+  }
+}
