@@ -152,7 +152,7 @@ const LoginForm = ({ onSwitchToRegister }) => {
           </p>
         </div>
 
-        <div className="features-preview">
+        {/* <div className="features-preview">
           <h4>✨ Portal Features:</h4>
           <ul>
             <li>📊 Personal progress tracking</li>
@@ -161,7 +161,7 @@ const LoginForm = ({ onSwitchToRegister }) => {
             <li>🚀 Project showcase</li>
             <li>📈 Statistics & achievements</li>
           </ul>
-        </div>
+        </div> */}
       </div>
     </div>
   );

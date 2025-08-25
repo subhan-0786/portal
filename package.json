@@ -2,7 +2,7 @@
   "name": "ai-naeco-internship-progress",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://subhan-0786.github.io/Internship-AINaecoBlue",
+  "homepage": "https://subhan-0786.github.io/portal",
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "@testing-library/dom": "^10.4.1",
