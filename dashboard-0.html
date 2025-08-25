@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildCorp Dashboard - Enhanced</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Enhanced CSS Custom Properties */
+            --primary-blue: #7c3aed;
+            --primary-blue-light: #a78bfa;
+            --highlight-orange: #f59e0b;
+            --highlight-orange-light: #fbbf24;
+            --success-green: #059669;
+            --success-green-light: #10b981;
+            --accent-purple: #4c1d95;
+            --accent-cyan: #0891b2;
+            --neutral-gray: #e2e8f0;
+            --dark-gray: #2d1b3d;
+            --darker-gray: #1a1a1a;
+            --text-primary: #e2e8f0;
+            --text-secondary: #c4b5fd;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d1b3d;
+            --bg-card: rgba(26, 26, 26, 0.9);
+            --bg-card-hover: rgba(26, 26, 26, 1);
+            --border-color: rgba(196, 181, 253, 0.3);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition-fast: all 0.15s ease;
+            --transition-medium: all 0.3s ease;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.2);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.25);
+            
+            /* Performance variables */
+            --gpu-acceleration: translateZ(0);
+        }
+
+        /* Light Theme */
+        [data-theme="light"] {
+            --primary-blue: #9333ea;
+            --primary-blue-light: #c084fc;
+            --text-primary: #1f2937;
+            --text-secondary: #6b21a8;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --bg-card: rgba(248, 250, 252, 0.9);
+            --bg-card-hover: rgba(248, 250, 252, 1);
+            --border-color: rgba(107, 33, 168, 0.2);
+        }
+
+        /* Critical CSS - Above the fold */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: var(--transition-fast);
+            transform: var(--gpu-acceleration);
+        }
+
+        /* Performance optimized components */
+        .performance-optimized {
+            will-change: transform;
+            backface-visibility: hidden;
+            perspective: 1000px;
+            transform: var(--gpu-acceleration);
+        }
+
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Sidebar - Performance Optimized */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--dark-gray) 0%, var(--darker-gray) 100%);
+            border-right: 1px solid var(--border-color);
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transform: var(--gpu-acceleration);
+            will-change: transform;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--highlight-orange) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar-nav li {
+            margin: 8px 0;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            margin-right: 16px;
+            position: relative;
+            overflow: hidden;
+            transform: var(--gpu-acceleration);
+            will-change: transform, background-color;
+        }
+
+        .sidebar-nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--highlight-orange);
+            transform: scaleY(0);
+            transition: transform 0.15s ease;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--text-primary);
+            background: var(--bg-card);
+            transform: translateX(4px) translateZ(0);
+            box-shadow: var(--shadow-light);
+        }
+
+        .sidebar-nav a:hover::before,
+        .sidebar-nav a.active::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar-nav i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content - Performance Optimized */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: var(--gpu-acceleration);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Topbar - Sticky Optimized */
+        .topbar {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+            transform: var(--gpu-acceleration);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: linear-gradient(135deg, var(--highlight-orange), var(--highlight-orange-light));
+            border: none;
+            padding: 12px;
+            border-radius: var(--border-radius-sm);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            transform: var(--gpu-acceleration);
+        }
+
+        .mobile-toggle:hover {
+            transform: translateY(-2px) translateZ(0);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .topbar-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .export-btn, .theme-toggle {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: var(--gpu-acceleration);
+        }
+
+        .theme-toggle.light {
+            background: linear-gradient(135deg, var(--highlight-orange), var(--highlight-orange-light));
+        }
+
+        .export-btn:hover, .theme-toggle:hover {
+            transform: translateY(-2px) translateZ(0);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Dashboard Content - Optimized Layout */
+        .dashboard-content {
+            padding: 32px 24px;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--highlight-orange), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Stats Grid - CSS Grid Optimized */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+            contain: layout style;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            padding: 28px 24px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-fast);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transform: var(--gpu-acceleration);
+            will-change: transform;
+            contain: layout style paint;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--highlight-orange), var(--success-green), var(--accent-purple), var(--accent-cyan));
+            transform: scaleX(0);
+            transition: transform 0.15s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px) translateZ(0);
+            background: var(--bg-card-hover);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--success-green), var(--success-green-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--highlight-orange), var(--highlight-orange-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .stat-change.positive {
+            background: linear-gradient(135deg, var(--success-green), var(--success-green-light));
+        }
+
+        .stat-change.negative {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+
+        /* Widget Grid - Optimized */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            contain: layout;
+        }
+
+        .widget {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: var(--transition-fast);
+            transform: var(--gpu-acceleration);
+            contain: layout style paint;
+        }
+
+        .widget:hover {
+            box-shadow: var(--shadow-medium);
+        }
+
+        .widget-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .widget-content {
+            padding: 24px;
+        }
+
+        /* Virtual Scrolling Container */
+        .virtual-scroll-container {
+            height: 400px;
+            overflow-y: auto;
+            contain: strict;
+        }
+
+        .virtual-scroll-item {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            transform: var(--gpu-acceleration);
+        }
+
+        /* Progress Bars - Optimized */
+        .progress-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-fast);
+            transform: var(--gpu-acceleration);
+        }
+
+        .progress-item:hover {
+            background: var(--bg-card);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-value {
+            font-weight: 700;
+            color: var(--highlight-orange);
+        }
+
+        .progress-bar-container {
+            background: var(--border-color);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green), var(--success-green-light));
+            transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            transform: var(--gpu-acceleration);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%);
+            background-size: 20px 20px;
+            animation: progressStripe 1s linear infinite;
+        }
+
+        @keyframes progressStripe {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+
+        /* Enhanced Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            contain: layout;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table tbody tr {
+            transition: background-color 0.1s ease;
+            transform: var(--gpu-acceleration);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-active { 
+            background: linear-gradient(135deg, var(--success-green), var(--success-green-light)); 
+        }
+        .status-pending { 
+            background: linear-gradient(135deg, var(--highlight-orange), var(--highlight-orange-light)); 
+        }
+        .status-completed { 
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light)); 
+        }
+        .status-inprogress {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+        }
+
+        /* Modal Optimizations */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-dialog {
+            transform: var(--gpu-acceleration);
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transform: var(--gpu-acceleration);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            color: white;
+            border-bottom: none;
+        }
+
+        .btn-close-white {
+            filter: invert(1);
+        }
+
+        .form-control, .form-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--highlight-orange);
+            box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.25);
+            background: var(--bg-card);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Chart Container - Optimized */
+        .chart-container {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 24px;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            height: 400px;
+            min-height: 300px;
+            contain: layout style;
+        }
+
+        .chart-container canvas {
+            max-width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Search and Filter Components */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 45px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--highlight-orange);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Filter Buttons */
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Notification System - Enhanced */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            padding: 16px 24px;
+            border-radius: var(--border-radius);
+            color: white;
+            z-index: 10000;
+            animation: slideInNotification 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: var(--shadow-medium);
+            font-weight: 600;
+            min-width: 300px;
+            transform: var(--gpu-acceleration);
+        }
+
+        @keyframes slideInNotification {
+            0% { 
+                transform: translateX(100%) translateZ(0);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(0) translateZ(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, var(--success-green), var(--success-green-light));
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, var(--highlight-orange), var(--highlight-orange-light));
+        }
+
+        /* Content sections - Optimized */
+        .content-section {
+            opacity: 1;
+            transform: none;
+            transition: none;
+            contain: layout style;
+        }
+
+        .content-section.active {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* Responsive Design - Enhanced */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-260px);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .stats-grid, .widget-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-content {
+                padding: 20px 16px;
+            }
+
+            .dashboard-title {
+                font-size: 1.6rem;
+            }
+
+            .chart-container {
+                padding: 16px;
+                height: 300px;
+            }
+
+            .topbar {
+                padding: 16px;
+            }
+
+            .topbar-right {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .export-btn, .theme-toggle {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .widget-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .chart-container {
+                height: 250px;
+                padding: 12px;
+            }
+
+            .stat-card {
+                padding: 20px 16px;
+            }
+
+            .stat-value {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar,
+            .mobile-toggle,
+            .topbar-right {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stat-card,
+            .widget {
+                break-inside: avoid;
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: rgba(255, 255, 255, 0.8);
+                --text-secondary: rgba(255, 255, 255, 0.9);
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* Table responsive */
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; z-index: 10001;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar performance-optimized" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-hard-hat"></i> BuildCorp</h3>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#dashboard" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="#analytics" class="nav-link" data-section="analytics"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="#projects" class="nav-link" data-section="projects"><i class="fas fa-project-diagram"></i> Projects</a></li>
+            <li><a href="#budget" class="nav-link" data-section="budget"><i class="fas fa-dollar-sign"></i> Budget</a></li>
+            <li><a href="#team" class="nav-link" data-section="team"><i class="fas fa-users"></i> Team</a></li>
+            <li><a href="#inventory" class="nav-link" data-section="inventory"><i class="fas fa-boxes"></i> Inventory</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content performance-optimized" id="mainContent">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle performance-optimized" id="mobileToggle"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb" id="breadcrumb">Dashboard / Overview</div>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle performance-optimized" id="themeToggle">
+                    <i class="fas fa-sun"></i>
+                    <span id="themeText">Light Mode</span>
+                </button>
+                <button class="export-btn performance-optimized" onclick="exportData()">
+                    <i class="fas fa-download"></i> 
+                    Export
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section active">
+                <h1 class="dashboard-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                
+                <!-- Search and Filters -->
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search projects, team members, or activities..." id="globalSearch">
+                </div>
+
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="projects">Projects</button>
+                    <button class="filter-btn" data-filter="team">Team</button>
+                    <button class="filter-btn" data-filter="budget">Budget</button>
+                    <button class="filter-btn" data-filter="recent">Recent</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card projects performance-optimized" data-category="projects">
+                        <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                        <div class="stat-value" id="totalProjects">12</div>
+                        <div class="stat-label">Active Projects</div>
+                        <div class="stat-change positive">+2 this month</div>
+                    </div>
+                    <div class="stat-card budget performance-optimized" data-category="budget">
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-value" id="totalBudget">$2.5M</div>
+                        <div class="stat-label">Budget Spent</div>
+                        <div class="stat-change positive">+5% efficiency</div>
+                    </div>
+                    <div class="stat-card team performance-optimized" data-category="team">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-value" id="totalTeam">85</div>
+                        <div class="stat-label">Team Members</div>
+                        <div class="stat-change positive">+3 new hires</div>
+                    </div>
+                    <div class="stat-card safety performance-optimized" data-category="projects">
+                        <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="stat-value" id="safetyDays">120</div>
+                        <div class="stat-label">Days Without Incident</div>
+                        <div class="stat-change negative">1 minor incident</div>
+                    </div>
+                </div>
+
+                <div class="widget-grid">
+                    <div class="widget performance-optimized">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Project Progress</h3>
+                            <button class="btn btn-light btn-sm" onclick="refreshComponent('projectProgress')">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="widget-content" id="projectProgressWidget"></div>
+                    </div>
+                    <div class="widget performance-optimized">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Recent Activity</h3>
+                            <button class="btn btn-light btn-sm" onclick="refreshComponent('activityFeed')">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="widget-content">
+                            <div class="virtual-scroll-container" id="activityFeed"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-chart-line"></i> Data Analytics</h1>
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">Analytics Overview</h3>
+                        <div>
+                            <button class="btn btn-light btn-sm" onclick="exportCharts()">
+                                <i class="fas fa-image"></i> Export Charts
+                            </button>
+                            <button class="btn btn-light btn-sm" onclick="refreshCharts()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div class="chart-container performance-optimized" id="progressChartContainer">
+                            <div class="chart-placeholder">
+                                <div>
+                                    <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 16px; display: block; text-align: center;"></i>
+                                    <div>Project Progress Chart</div>
+                                    <small style="color: var(--text-secondary);">Interactive chart will load here</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container performance-optimized" id="budgetChartContainer">
+                            <div class="chart-placeholder">
+                                <div>
+                                    <i class="fas fa-chart-pie" style="font-size: 3rem; margin-bottom: 16px; display: block; text-align: center;"></i>
+                                    <div>Budget Distribution Chart</div>
+                                    <small style="color: var(--text-secondary);">Interactive chart will load here</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container performance-optimized" id="monthlyChartContainer">
+                            <div class="chart-placeholder">
+                                <div>
+                                    <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 16px; display: block; text-align: center;"></i>
+                                    <div>Monthly Spending Trends</div>
+                                    <small style="color: var(--text-secondary);">Interactive chart will load here</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projects-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-project-diagram"></i> Projects</h1>
+                
+                <!-- Project Filters -->
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">All Projects</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">All Projects</h3>
+                        <div>
+                            <button class="btn btn-light btn-sm" onclick="exportProjects()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-light" onclick="showProjectModal('add')">
+                                <i class="fas fa-plus"></i> Add Project
+                            </button>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project Name</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                        <th>Budget</th>
+                                        <th>Team</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projectsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Section -->
+            <div id="budget-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-dollar-sign"></i> Budget</h1>
+                <div class="stats-grid">
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-value">$5.8M</div>
+                        <div class="stat-label">Total Budget</div>
+                        <div class="stat-change positive">+15% from last year</div>
+                    </div>
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="stat-value">$2.5M</div>
+                        <div class="stat-label">Spent</div>
+                        <div class="stat-change positive">43% of budget</div>
+                    </div>
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-piggy-bank"></i></div>
+                        <div class="stat-value">$3.3M</div>
+                        <div class="stat-label">Remaining</div>
+                        <div class="stat-change positive">57% available</div>
+                    </div>
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-value">92%</div>
+                        <div class="stat-label">Budget Efficiency</div>
+                        <div class="stat-change positive">+8% improvement</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div id="team-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-users"></i> Team</h1>
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">Team Members</h3>
+                        <button class="btn btn-light" onclick="addTeamMember()">
+                            <i class="fas fa-user-plus"></i> Add Member
+                        </button>
+                    </div>
+                    <div class="widget-content">
+                        <div class="row" id="teamGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Section -->
+            <div id="inventory-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Inventory</h1>
+                <div class="stats-grid">
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-cubes"></i></div>
+                        <div class="stat-value">1,500</div>
+                        <div class="stat-label">Total Items</div>
+                        <div class="stat-change positive">+50 new items</div>
+                    </div>
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-value">$450K</div>
+                        <div class="stat-label">Inventory Value</div>
+                        <div class="stat-change positive">+12% growth</div>
+                    </div>
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-value">23</div>
+                        <div class="stat-label">Low Stock Items</div>
+                        <div class="stat-change negative">Needs attention</div>
+                    </div>
+                    <div class="stat-card performance-optimized">
+                        <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">Pending Orders</div>
+                        <div class="stat-change positive">On schedule</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Enhanced Project Modal -->
+    <div class="modal fade" id="projectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content performance-optimized">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="projectModalTitle">Add Project</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeModal()" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="projectForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="projectName" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="projectName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectBudget" class="form-label">Budget ($)</label>
+                            <input type="number" class="form-control" id="projectBudget" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectStatus" class="form-label">Status</label>
+                            <select class="form-select" id="projectStatus" required>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectProgress" class="form-label">Progress (%)</label>
+                            <input type="number" class="form-control" id="projectProgress" min="0" max="100" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="projectDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="projectDescription" rows="3" placeholder="Project description..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectStartDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="projectStartDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectEndDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="projectEndDate">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn" id="projectSubmitBtn" style="background: var(--success-green); color: white;" onclick="submitProject()">Add Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global Variables - In-Memory Storage
+        let appState = {
+            theme: 'dark',
+            currentSection: 'dashboard',
+            projects: [
+                { id: 1, name: "Downtown Tower", status: "In Progress", progress: 75, budget: 1500000, startDate: "2024-01-15", endDate: "2024-12-15", team: ["John", "Jane"], description: "Modern office tower in downtown area" },
+                { id: 2, name: "Highway Bridge", status: "In Progress", progress: 60, budget: 800000, startDate: "2024-02-01", endDate: "2024-10-31", team: ["Mike", "Sarah"], description: "Steel bridge construction over highway" },
+                { id: 3, name: "Eco Village", status: "Completed", progress: 100, budget: 2000000, startDate: "2023-06-01", endDate: "2024-01-30", team: ["John", "Mike"], description: "Sustainable residential community" },
+                { id: 4, name: "Shopping Mall", status: "Pending", progress: 25, budget: 1200000, startDate: "2024-06-01", endDate: "2025-05-31", team: ["Jane", "Sarah"], description: "Large retail complex with parking" }
+            ],
+            team: [
+                { id: 1, name: "John Doe", role: "Project Manager", avatar: "👷", skills: ["Leadership", "Planning"], certifications: ["PMP", "Safety"] },
+                { id: 2, name: "Jane Smith", role: "Engineer", avatar: "👷‍♀️", skills: ["Structural", "Design"], certifications: ["PE", "LEED"] },
+                { id: 3, name: "Mike Johnson", role: "Architect", avatar: "👨‍💼", skills: ["Design", "CAD"], certifications: ["AIA", "NCARB"] },
+                { id: 4, name: "Sarah Wilson", role: "Safety Officer", avatar: "👷‍♀️", skills: ["Safety", "Compliance"], certifications: ["OSHA", "CSP"] }
+            ],
+            activities: [],
+            monthlySpending: [0.5, 0.7, 0.4, 0.9, 0.6, 0.8, 1.2, 0.9, 1.1, 0.8, 0.7, 1.0],
+            filters: {
+                dashboard: 'all',
+                projects: 'all',
+                searchTerm: ''
+            }
+        };
+
+        let currentProjectId = null;
+        let charts = {};
+
+        // Notification Manager
+        class NotificationManager {
+            constructor() {
+                this.notifications = [];
+                this.maxNotifications = 3;
+                this.defaultDuration = 4000;
+            }
+
+            show(message, type = 'info', duration = null) {
+                const notification = this.createNotification(message, type, duration || this.defaultDuration);
+                this.addNotification(notification);
+                return notification.id;
+            }
+
+            createNotification(message, type, duration) {
+                const id = Date.now() + Math.random();
+                const notification = {
+                    id,
+                    message,
+                    type,
+                    duration,
+                    element: null,
+                    timeout: null
+                };
+
+                notification.element = this.createElement(notification);
+                return notification;
+            }
+
+            createElement(notification) {
+                const element = document.createElement('div');
+                element.className = `notification ${notification.type}`;
+                element.style.transform = 'translateX(100%)';
+                element.style.opacity = '0';
+                
+                const iconMap = {
+                    success: 'check-circle',
+                    error: 'exclamation-triangle',
+                    warning: 'exclamation-circle',
+                    info: 'info-circle'
+                };
+                
+                element.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-${iconMap[notification.type]}"></i>
+                            <span>${notification.message}</span>
+                        </div>
+                        <button onclick="notificationManager.dismiss('${notification.id}')" style="background: none; border: none; color: white; cursor: pointer; padding: 4px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                return element;
+            }
+
+            addNotification(notification) {
+                // Remove old notifications if we have too many
+                while (this.notifications.length >= this.maxNotifications) {
+                    const oldest = this.notifications.shift();
+                    this.removeNotification(oldest);
+                }
+                
+                this.notifications.push(notification);
+                document.body.appendChild(notification.element);
+                
+                // Position notification
+                this.repositionNotifications();
+                
+                // Animate in
+                requestAnimationFrame(() => {
+                    notification.element.style.transform = 'translateX(0)';
+                    notification.element.style.opacity = '1';
+                });
+                
+                // Auto dismiss
+                if (notification.duration > 0) {
+                    notification.timeout = setTimeout(() => {
+                        this.dismiss(notification.id);
+                    }, notification.duration);
+                }
+            }
+
+            dismiss(id) {
+                const notification = this.notifications.find(n => n.id == id);
+                if (notification) {
+                    this.removeNotification(notification);
+                    this.notifications = this.notifications.filter(n => n.id !== id);
+                    this.repositionNotifications();
+                }
+            }
+
+            removeNotification(notification) {
+                if (notification.timeout) {
+                    clearTimeout(notification.timeout);
+                }
+                
+                if (notification.element && notification.element.parentNode) {
+                    notification.element.style.transform = 'translateX(100%)';
+                    notification.element.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (notification.element.parentNode) {
+                            notification.element.parentNode.removeChild(notification.element);
+                        }
+                    }, 300);
+                }
+            }
+
+            repositionNotifications() {
+                this.notifications.forEach((notification, index) => {
+                    if (notification.element) {
+                        notification.element.style.top = `${20 + (index * 80)}px`;
+                    }
+                });
+            }
+        }
+
+        const notificationManager = new NotificationManager();
+
+        // Initialize Application
+        function initializeApp() {
+            try {
+                hideLoadingScreen();
+                generateActivities();
+                initializeNavigation();
+                initializeTheme();
+                initializeSearch();
+                renderDashboard();
+                renderProjectsTable();
+                renderTeamGrid();
+                renderActivityFeed();
+                notificationManager.show('BuildCorp Dashboard loaded successfully!', 'success');
+            } catch (error) {
+                console.error('Failed to initialize application:', error);
+                notificationManager.show('Failed to load dashboard', 'error');
+                hideLoadingScreen();
+            }
+        }
+
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        function generateActivities() {
+            appState.activities = [
+                { activity: "Material Delivery", project: "Downtown Tower", status: "Completed", timestamp: Date.now() - 3600000 },
+                { activity: "Safety Check", project: "Highway Bridge", status: "Pending", timestamp: Date.now() - 7200000 },
+                { activity: "Design Review", project: "Eco Village", status: "Completed", timestamp: Date.now() - 10800000 },
+                { activity: "Budget Approval", project: "Shopping Mall", status: "Pending", timestamp: Date.now() - 14400000 },
+                { activity: "Foundation Complete", project: "Downtown Tower", status: "Completed", timestamp: Date.now() - 18000000 },
+                { activity: "Equipment Maintenance", project: "Highway Bridge", status: "In Progress", timestamp: Date.now() - 21600000 }
+            ];
+        }
+
+        function initializeNavigation() {
+            const mobileToggle = document.getElementById('mobileToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    sidebar?.classList.toggle('show');
+                });
+            }
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    const section = link.getAttribute('data-section');
+                    showSection(section);
+                    updateBreadcrumb(link.textContent.trim());
+                    
+                    // Update active states
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    // Hide sidebar on mobile
+                    if (window.innerWidth <= 768) {
+                        sidebar?.classList.remove('show');
+                    }
+                });
+            });
+        }
+
+        function initializeTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const currentTheme = appState.theme;
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    appState.theme = newTheme;
+                    applyTheme(newTheme);
+                });
+            }
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('globalSearch');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        appState.filters.searchTerm = e.target.value;
+                        performSearch(e.target.value);
+                    }, 300);
+                });
+            }
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const filter = e.target.getAttribute('data-filter');
+                    
+                    // Update active state
+                    e.target.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Apply filter
+                    applyFilter(filter);
+                });
+            });
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+            
+            // Show target section
+            const target = document.getElementById(`${sectionName}-section`);
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+                appState.currentSection = sectionName;
+            }
+        }
+
+        function updateBreadcrumb(sectionName) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            if (breadcrumb) {
+                breadcrumb.textContent = `Dashboard / ${sectionName}`;
+            }
+        }
+
+        function applyTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                const icon = themeToggle.querySelector('i');
+                const text = themeToggle.querySelector('span');
+                
+                if (theme === 'light') {
+                    themeToggle.classList.add('light');
+                    if (icon) icon.className = 'fas fa-moon';
+                    if (text) text.textContent = 'Dark Mode';
+                } else {
+                    themeToggle.classList.remove('light');
+                    if (icon) icon.className = 'fas fa-sun';
+                    if (text) text.textContent = 'Light Mode';
+                }
+            }
+            
+            notificationManager.show(`Switched to ${theme} theme`, 'success');
+        }
+
+        function performSearch(searchTerm) {
+            if (!searchTerm.trim()) {
+                clearSearchResults();
+                return;
+            }
+
+            const results = searchAll(searchTerm);
+            displaySearchResults(results);
+        }
+
+        function searchAll(term) {
+            const projects = appState.projects || [];
+            const team = appState.team || [];
+            const activities = appState.activities || [];
+            
+            const results = {
+                projects: projects.filter(p => 
+                    p.name.toLowerCase().includes(term.toLowerCase()) ||
+                    p.description?.toLowerCase().includes(term.toLowerCase())
+                ),
+                team: team.filter(t => 
+                    t.name.toLowerCase().includes(term.toLowerCase()) ||
+                    t.role.toLowerCase().includes(term.toLowerCase())
+                ),
+                activities: activities.filter(a => 
+                    a.activity.toLowerCase().includes(term.toLowerCase()) ||
+                    a.project.toLowerCase().includes(term.toLowerCase())
+                )
+            };
+            
+            return results;
+        }
+
+        function displaySearchResults(results) {
+            console.log('Search results:', results);
+            notificationManager.show(`Found ${results.projects.length} projects, ${results.team.length} team members, ${results.activities.length} activities`, 'info');
+        }
+
+        function clearSearchResults() {
+            applyFilter('all');
+        }
+
+        function applyFilter(filter) {
+            const currentSection = appState.currentSection;
+            appState.filters[currentSection] = filter;
+            
+            if (currentSection === 'dashboard') {
+                filterDashboardItems(filter);
+            } else if (currentSection === 'projects') {
+                filterProjectItems(filter);
+            }
+        }
+
+        function filterDashboardItems(filter) {
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                if (filter === 'all' || category === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterProjectItems(filter) {
+            const projects = appState.projects || [];
+            let filteredProjects;
+            
+            if (filter === 'all') {
+                filteredProjects = projects;
+            } else {
+                filteredProjects = projects.filter(p => 
+                    p.status.toLowerCase().replace(' ', '') === filter
+                );
+            }
+            
+            renderProjectsTable(filteredProjects);
+        }
+
+        function renderDashboard() {
+            const projects = appState.projects || [];
+            const team = appState.team || [];
+            
+            // Update stat values
+            const totalProjects = document.getElementById('totalProjects');
+            const totalTeam = document.getElementById('totalTeam');
+            const totalBudget = document.getElementById('totalBudget');
+            const safetyDays = document.getElementById('safetyDays');
+            
+            if (totalProjects) totalProjects.textContent = projects.length;
+            if (totalTeam) totalTeam.textContent = team.length;
+            if (totalBudget) {
+                const spent = projects.reduce((sum, p) => sum + (p.budget * p.progress / 100), 0);
+                totalBudget.textContent = `${(spent / 1000000).toFixed(1)}M`;
+            }
+            if (safetyDays) safetyDays.textContent = '120';
+
+            renderProjectProgress();
+        }
+
+        function renderProjectProgress() {
+            const projects = appState.projects || [];
+            const container = document.getElementById('projectProgressWidget');
+            
+            if (!container) return;
+            
+            const html = projects.slice(0, 4).map(project => `
+                <div class="progress-item performance-optimized">
+                    <div class="progress-header">
+                        <span class="progress-label">${project.name}</span>
+                        <span class="progress-value">${project.progress}%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${project.progress}%"></div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                        Budget: ${project.budget.toLocaleString()} • Status: ${project.status}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function renderActivityFeed() {
+            const activities = appState.activities || [];
+            const container = document.getElementById('activityFeed');
+            
+            if (!container) return;
+            
+            const html = activities.map(activity => `
+                <div style="padding: 16px; background: var(--bg-secondary); border-left: 4px solid var(--highlight-orange); border-radius: var(--border-radius-sm); margin-bottom: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 4px;">${activity.activity}</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">${activity.project}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">${formatTimeAgo(activity.timestamp)}</span>
+                        <span class="status-badge status-${activity.status.toLowerCase().replace(' ', '')}" style="font-size: 0.75rem; padding: 4px 8px;">${activity.status}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function renderProjectsTable(projectsToRender = null) {
+            const projects = projectsToRender || appState.projects || [];
+            const tbody = document.getElementById('projectsTable');
+            
+            if (!tbody) return;
+            
+            const html = projects.map(project => {
+                const statusClass = project.status.toLowerCase().replace(' ', '');
+                const teamMembers = project.team?.join(', ') || 'Unassigned';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${project.name}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">ID: #${project.id}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">${project.description || 'No description'}</div>
+                        </td>
+                        <td><span class="status-badge status-${statusClass}">${project.status}</span></td>
+                        <td>
+                            <div class="progress-header" style="margin-bottom: 8px;">
+                                <span class="progress-value">${project.progress}%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: ${project.progress}%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600;">${project.budget.toLocaleString()}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                                Spent: ${Math.round(project.budget * project.progress / 100).toLocaleString()}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.85rem;">${teamMembers}</div>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm" style="background: var(--success-green); color: white; border-radius: 6px; padding: 6px 12px; margin-right: 4px;" onclick="showProjectModal('edit', ${project.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm" style="background: #dc2626; color: white; border-radius: 6px; padding: 6px 12px;" onclick="deleteProject(${project.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = html;
+        }
+
+        function renderTeamGrid() {
+            const team = appState.team || [];
+            const teamGrid = document.getElementById('teamGrid');
+            
+            if (!teamGrid) return;
+            
+            const html = team.map(member => `
+                <div class="col-lg-6 col-md-12 mb-3">
+                    <div class="stat-card text-center performance-optimized">
+                        <div class="stat-icon" style="font-size: 3rem; margin-bottom: 16px;">${member.avatar}</div>
+                        <div class="stat-value" style="font-size: 1.5rem; margin-bottom: 8px;">${member.name}</div>
+                        <div class="stat-label">${member.role}</div>
+                        ${member.skills ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">Skills: ${member.skills.join(', ')}</div>` : ''}
+                        ${member.certifications ? `<div style="font-size: 0.8rem; color: var(--success-green); margin-top: 4px;">Certified: ${member.certifications.join(', ')}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            teamGrid.innerHTML = html;
+        }
+
+        // Project Management Functions
+        function showProjectModal(mode = 'add', id = null) {
+            const modal = document.getElementById('projectModal');
+            const form = document.getElementById('projectForm');
+            
+            if (mode === 'edit' && id) {
+                const project = appState.projects.find(p => p.id === id);
+                if (project) {
+                    currentProjectId = id;
+                    document.getElementById('projectModalTitle').textContent = 'Edit Project';
+                    document.getElementById('projectSubmitBtn').textContent = 'Save Changes';
+                    populateForm(project);
+                }
+            } else {
+                currentProjectId = null;
+                document.getElementById('projectModalTitle').textContent = 'Add Project';
+                document.getElementById('projectSubmitBtn').textContent = 'Add Project';
+                form.reset();
+            }
+            
+            // Show modal
+            modal.style.display = 'block';
+            modal.classList.add('show');
+            
+            // Add backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            document.body.style.overflow = '';
+            
+            // Reset form
+            document.getElementById('projectForm').reset();
+            currentProjectId = null;
+        }
+
+        function populateForm(project) {
+            document.getElementById('projectName').value = project.name || '';
+            document.getElementById('projectBudget').value = project.budget || '';
+            document.getElementById('projectStatus').value = project.status || '';
+            document.getElementById('projectProgress').value = project.progress || '';
+            document.getElementById('projectDescription').value = project.description || '';
+            document.getElementById('projectStartDate').value = project.startDate || '';
+            document.getElementById('projectEndDate').value = project.endDate || '';
+        }
+
+        function submitProject() {
+            const formData = getFormData();
+            
+            if (!validateForm(formData)) {
+                return;
+            }
+            
+            const projects = appState.projects || [];
+            
+            if (currentProjectId) {
+                // Update existing project
+                const index = projects.findIndex(p => p.id === currentProjectId);
+                if (index !== -1) {
+                    projects[index] = { ...projects[index], ...formData };
+                    appState.projects = projects;
+                    notificationManager.show('Project updated successfully!', 'success');
+                }
+            } else {
+                // Add new project
+                const newProject = {
+                    id: Math.max(...projects.map(p => p.id), 0) + 1,
+                    team: [],
+                    ...formData
+                };
+                
+                projects.push(newProject);
+                appState.projects = projects;
+                notificationManager.show('Project added successfully!', 'success');
+            }
+            
+            // Close modal and refresh
+            closeModal();
+            renderProjectsTable();
+            renderDashboard();
+        }
+
+        function getFormData() {
+            return {
+                name: document.getElementById('projectName').value.trim(),
+                budget: parseInt(document.getElementById('projectBudget').value) || 0,
+                status: document.getElementById('projectStatus').value,
+                progress: parseInt(document.getElementById('projectProgress').value) || 0,
+                description: document.getElementById('projectDescription').value.trim(),
+                startDate: document.getElementById('projectStartDate').value,
+                endDate: document.getElementById('projectEndDate').value
+            };
+        }
+
+        function validateForm(formData) {
+            if (!formData.name) {
+                notificationManager.show('Project name is required', 'error');
+                return false;
+            }
+            
+            if (formData.budget <= 0) {
+                notificationManager.show('Budget must be greater than 0', 'error');
+                return false;
+            }
+            
+            if (formData.progress < 0 || formData.progress > 100) {
+                notificationManager.show('Progress must be between 0 and 100', 'error');
+                return false;
+            }
+            
+            if (formData.startDate && formData.endDate && new Date(formData.startDate) > new Date(formData.endDate)) {
+                notificationManager.show('End date must be after start date', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function deleteProject(id) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                const projects = appState.projects || [];
+                appState.projects = projects.filter(p => p.id !== id);
+                notificationManager.show('Project deleted successfully', 'success');
+                
+                renderProjectsTable();
+                renderDashboard();
+            }
+        }
+
+        // Utility Functions
+        function formatTimeAgo(timestamp) {
+            const diff = Date.now() - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (days > 0) {
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (hours > 0) {
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else {
+                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            }
+        }
+
+        function refreshComponent(componentName) {
+            switch(componentName) {
+                case 'projectProgress':
+                    renderProjectProgress();
+                    break;
+                case 'activityFeed':
+                    renderActivityFeed();
+                    break;
+                default:
+                    break;
+            }
+            notificationManager.show(`${componentName} refreshed`, 'success');
+        }
+
+        function exportData() {
+            const exportData = {
+                ...appState,
+                exportDate: new Date().toISOString(),
+                version: '2.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+                type: 'application/json' 
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `buildcorp-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            notificationManager.show('Data exported successfully!', 'success');
+        }
+
+        function exportProjects() {
+            const projects = appState.projects;
+            const csv = convertToCSV(projects);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `buildcorp-projects-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            notificationManager.show('Projects exported successfully', 'success');
+        }
+
+        function convertToCSV(data) {
+            if (!data || data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => 
+                    headers.map(header => {
+                        const value = row[header];
+                        return typeof value === 'string' && value.includes(',') 
+                            ? `"${value}"` 
+                            : value;
+                    }).join(',')
+                )
+            ].join('\n');
+            
+            return csvContent;
+        }
+
+        function exportCharts() {
+            notificationManager.show('Chart export feature would be available with Chart.js loaded', 'info');
+        }
+
+        function refreshCharts() {
+            notificationManager.show('Charts refreshed (placeholder - requires Chart.js)', 'success');
+        }
+
+        function addTeamMember() {
+            notificationManager.show('Add team member feature coming soon!', 'info');
+        }
+
+        // Event Listeners
+        document.addEventListener('keydown', (e) => {
+            // Escape: Close modal
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('projectModal');
+                if (modal.style.display === 'block') {
+                    closeModal();
+                }
+                
+                const searchInput = document.getElementById('globalSearch');
+                if (searchInput && searchInput === document.activeElement) {
+                    searchInput.value = '';
+                    clearSearchResults();
+                }
+            }
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 768) {
+                sidebar?.classList.remove('show');
+            }
+        });
+
+        // Close modal when clicking backdrop
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'modal-backdrop') {
+                closeModal();
+            }
+        });
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initializeApp, 500); // Small delay for smooth loading animation
+        });
+
+        // Error handling
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            notificationManager.show('An error occurred. Please refresh if issues persist.', 'error');
+        });
+
+        // Legacy functions for backwards compatibility
+        function showNotification(message, type = 'info') {
+            notificationManager.show(message, type);
+        }
+
+        function editProject(id) {
+            showProjectModal('edit', id);
+        }
+    </script>
+</body>
+</html>
+                    

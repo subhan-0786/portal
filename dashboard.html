@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildCorp Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Weather App Theme Colors - Dark Mode Only */
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #252540;
+            --text-primary: #ffffff;
+            --text-secondary: #c7d2fe;
+            --text-tertiary: #e0e7ff;
+            --border-color: #3b3b5c;
+            --shadow-light: rgba(0, 0, 0, 0.4);
+            --shadow-medium: rgba(0, 0, 0, 0.6);
+            --glassmorphism: rgba(37, 37, 64, 0.8);
+            
+            /* BuildCorp Specific Cards with Weather App Style */
+            --search-card-bg: #1e1b4b;
+            --search-card-border: #4338ca;
+            --locations-card-bg: #1f2937;
+            --locations-card-border: #059669;
+            --weather-display-bg: #1f2937;
+            --weather-display-border: #059669;
+            --error-card-bg: #451a03;
+            --error-card-border: #ef4444;
+            
+            /* Vibrant Accent Colors */
+            --primary-blue: #6366f1;
+            --success-green: #22d3ee;
+            --warning-orange: #fb923c;
+            --purple-accent: #c084fc;
+            --error-red: #ef4444;
+            
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --transition-fast: all 0.2s ease;
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 4px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition-fast);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Loading states - Simplified */
+        .loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid var(--primary-blue);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 1000;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Sidebar - Weather App Style */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--locations-card-bg) 100%);
+            border-right: 1px solid var(--locations-card-border);
+            transition: var(--transition-fast);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-280px);
+        }
+
+        .sidebar-header {
+            padding: 30px 24px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--search-card-bg) 100%);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0 0 16px 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0 16px;
+        }
+
+        .sidebar-nav li {
+            margin: 8px 0;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--bg-card) 0%, transparent 100%);
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--search-card-bg) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-blue);
+        }
+
+        .sidebar-nav i {
+            margin-right: 16px;
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            transition: var(--transition-fast);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Topbar - Weather App Style */
+        .topbar {
+            background: var(--glassmorphism);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+            border-radius: 0 0 16px 16px;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: linear-gradient(135deg, var(--warning-orange) 0%, var(--purple-accent) 100%);
+            border: none;
+            padding: 12px;
+            border-radius: var(--border-radius-sm);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .mobile-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .breadcrumb {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .topbar-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--purple-accent) 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 32px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        /* Stats Cards - Weather App Style */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--locations-card-bg) 100%);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--locations-card-border);
+            transition: var(--transition-fast);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--success-green);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--success-green);
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .stat-change.positive {
+            background: linear-gradient(135deg, var(--success-green) 0%, var(--primary-blue) 100%);
+        }
+
+        .stat-change.negative {
+            background: linear-gradient(135deg, var(--error-red) 0%, var(--warning-orange) 100%);
+        }
+
+        /* Widgets - Weather App Style */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+        }
+
+        .widget {
+            background: linear-gradient(135deg, var(--weather-display-bg) 0%, var(--bg-card) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--weather-display-border);
+            overflow: hidden;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-card);
+        }
+
+        .widget:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .widget-header {
+            padding: 24px 30px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--bg-secondary) 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .widget-content {
+            padding: 30px;
+        }
+
+        /* Progress Bars - Simplified without shiny effect */
+        .progress-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-card);
+        }
+
+        .progress-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-value {
+            font-weight: 700;
+            color: var(--success-green);
+        }
+
+        .progress-bar-container {
+            background: rgba(59, 59, 92, 0.3);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green) 0%, var(--primary-blue) 100%);
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+        }
+
+        /* Tables - Weather App Style */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--bg-secondary) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tbody tr {
+            transition: var(--transition-fast);
+        }
+
+        .data-table tbody tr:hover {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-active { 
+            background: linear-gradient(135deg, var(--success-green) 0%, var(--primary-blue) 100%); 
+        }
+        .status-pending { 
+            background: linear-gradient(135deg, var(--warning-orange) 0%, var(--purple-accent) 100%); 
+        }
+        .status-completed { 
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--success-green) 100%); 
+        }
+        .status-inprogress {
+            background: linear-gradient(135deg, var(--purple-accent) 0%, var(--success-green) 100%);
+        }
+
+        /* Modal - Weather App Style */
+        .modal-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--bg-secondary) 100%);
+            color: white;
+            border-bottom: none;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .form-control, .form-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-card);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Charts - Weather App Style */
+        .chart-container {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            height: 400px;
+            min-height: 300px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .chart-container canvas {
+            max-width: 100% !important;
+            height: 100% !important;
+            transition: opacity 0.3s ease;
+        }
+
+        .chart-container.loading canvas {
+            opacity: 0.5;
+        }
+
+        .chart-container.loading::before {
+            content: 'Loading Chart...';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-secondary);
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        /* Notification - Weather App Style */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--purple-accent) 100%);
+            padding: 20px 24px;
+            border-radius: var(--border-radius);
+            color: white;
+            z-index: 10000;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-card);
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        @keyframes slideIn {
+            0% { 
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            0% { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Content sections */
+        .content-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        .content-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar - Weather App Style */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(59, 59, 92, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.7);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .stats-grid, .widget-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .dashboard-content {
+                padding: 20px 16px;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                padding: 20px;
+                height: 300px;
+            }
+
+            .topbar {
+                padding: 16px;
+            }
+
+            .export-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .stat-card {
+                padding: 24px 20px;
+            }
+
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .widget-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .chart-container {
+                height: 250px;
+                padding: 16px;
+            }
+
+            .stat-card {
+                padding: 20px 16px;
+            }
+
+            .stat-value {
+                font-size: 2.2rem;
+            }
+
+            .dashboard-title {
+                font-size: 1.8rem;
+                text-align: center;
+            }
+
+            .widget-content {
+                padding: 20px;
+            }
+        }
+
+        /* Performance optimizations */
+        .touch-device .stat-card:hover,
+        .touch-device .sidebar-nav a:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Focus styles for accessibility */
+        .keyboard-navigation *:focus {
+            outline: 2px solid var(--warning-orange) !important;
+            outline-offset: 2px !important;
+        }
+        
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .topbar,
+            .mobile-toggle,
+            .export-btn {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            
+            .stat-card,
+            .widget,
+            .chart-container {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-hard-hat"></i> BuildCorp</h3>
+            <p>Construction Dashboard</p>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#dashboard" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="#analytics" class="nav-link" data-section="analytics"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="#projects" class="nav-link" data-section="projects"><i class="fas fa-project-diagram"></i> Projects</a></li>
+            <li><a href="#budget" class="nav-link" data-section="budget"><i class="fas fa-dollar-sign"></i> Budget</a></li>
+            <li><a href="#team" class="nav-link" data-section="team"><i class="fas fa-users"></i> Team</a></li>
+            <li><a href="#inventory" class="nav-link" data-section="inventory"><i class="fas fa-boxes"></i> Inventory</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb" id="breadcrumb">Dashboard / Overview</div>
+            </div>
+            <div class="topbar-right">
+                <button class="export-btn" onclick="exportData()">
+                    <i class="fas fa-download"></i> 
+                    Export
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section active">
+                <h1 class="dashboard-title"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+                <div class="stats-grid">
+                    <div class="stat-card projects">
+                        <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                        <div class="stat-value" id="totalProjects">12</div>
+                        <div class="stat-label">Active Projects</div>
+                        <div class="stat-change positive">+2 this month</div>
+                    </div>
+                    <div class="stat-card budget">
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-value" id="totalBudget">$2.5M</div>
+                        <div class="stat-label">Budget Spent</div>
+                        <div class="stat-change positive">+5% efficiency</div>
+                    </div>
+                    <div class="stat-card team">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-value" id="totalTeam">85</div>
+                        <div class="stat-label">Team Members</div>
+                        <div class="stat-change positive">+3 new hires</div>
+                    </div>
+                    <div class="stat-card safety">
+                        <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="stat-value" id="safetyDays">120</div>
+                        <div class="stat-label">Days Without Incident</div>
+                        <div class="stat-change negative">1 minor incident</div>
+                    </div>
+                </div>
+                <div class="widget-grid">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Project Progress</h3>
+                        </div>
+                        <div class="widget-content">
+                            <div class="progress-item">
+                                <div class="progress-header">
+                                    <span class="progress-label">Downtown Tower</span>
+                                    <span class="progress-value">75%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-header">
+                                    <span class="progress-label">Highway Bridge</span>
+                                    <span class="progress-value">60%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Recent Activity</h3>
+                        </div>
+                        <div class="widget-content" id="activityFeed"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-chart-line"></i> Data Analytics</h1>
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">Analytics Overview</h3>
+                    </div>
+                    <div class="widget-content">
+                        <div class="chart-container" id="progressChartContainer">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                        <div class="chart-container" id="budgetChartContainer">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+                        <div class="chart-container" id="monthlyChartContainer">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projects-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-project-diagram"></i> Projects Management</h1>
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">All Projects</h3>
+                        <button class="btn btn-light" onclick="showProjectModal('add')"><i class="fas fa-plus"></i> Add Project</button>
+                    </div>
+                    <div class="widget-content">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project Name</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                        <th>Budget</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projectsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Section -->
+            <div id="budget-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-dollar-sign"></i> Budget Overview</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-value">$5.8M</div>
+                        <div class="stat-label">Total Budget</div>
+                        <div class="stat-change positive">Budget Allocated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="stat-value">$2.5M</div>
+                        <div class="stat-label">Spent</div>
+                        <div class="stat-change positive">43% Used</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-piggy-bank"></i></div>
+                        <div class="stat-value">$3.3M</div>
+                        <div class="stat-label">Remaining</div>
+                        <div class="stat-change positive">57% Available</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div id="team-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-users"></i> Team Management</h1>
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">Team Members</h3>
+                    </div>
+                    <div class="widget-content">
+                        <div class="row" id="teamGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Section -->
+            <div id="inventory-section" class="content-section" style="display: none;">
+                <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Inventory Management</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-cubes"></i></div>
+                        <div class="stat-value">1,500</div>
+                        <div class="stat-label">Total Items</div>
+                        <div class="stat-change positive">+50 new items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-value">$450K</div>
+                        <div class="stat-label">Inventory Value</div>
+                        <div class="stat-change positive">+5% increase</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-value">23</div>
+                        <div class="stat-label">Low Stock Items</div>
+                        <div class="stat-change negative">Needs attention</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Project Modal -->
+    <div class="modal fade" id="projectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="projectModalTitle">Add Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="projectForm" class="row g-3">
+                        <div class="col-12">
+                            <label for="projectName" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="projectName" required placeholder="Enter project name">
+                        </div>
+                        <div class="col-12">
+                            <label for="projectBudget" class="form-label">Budget ($)</label>
+                            <input type="number" class="form-control" id="projectBudget" required placeholder="Enter budget amount">
+                        </div>
+                        <div class="col-12">
+                            <label for="projectStatus" class="form-label">Status</label>
+                            <select class="form-select" id="projectStatus" required>
+                                <option value="">Select Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="projectProgress" class="form-label">Progress (%)</label>
+                            <input type="number" class="form-control" id="projectProgress" min="0" max="100" required placeholder="Enter progress percentage">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn" id="projectSubmitBtn" style="background: var(--success-green); color: white;" onclick="submitProject()">Add Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample Data - Optimized for performance
+        const data = {
+            projects: [
+                { id: 1, name: "Downtown Tower", status: "In Progress", progress: 75, budget: 1500000 },
+                { id: 2, name: "Highway Bridge", status: "In Progress", progress: 60, budget: 800000 },
+                { id: 3, name: "Eco Village", status: "Completed", progress: 100, budget: 2000000 },
+                { id: 4, name: "Shopping Mall", status: "Pending", progress: 25, budget: 1200000 }
+            ],
+            team: [
+                { id: 1, name: "John Doe", role: "Project Manager", avatar: "👷" },
+                { id: 2, name: "Jane Smith", role: "Engineer", avatar: "👷‍♀️" },
+                { id: 3, name: "Mike Johnson", role: "Architect", avatar: "👨‍💼" },
+                { id: 4, name: "Sarah Wilson", role: "Safety Officer", avatar: "👷‍♀️" }
+            ],
+            activities: [
+                { activity: "Material Delivery", project: "Downtown Tower", status: "Completed", timestamp: Date.now() - 3600000 },
+                { activity: "Safety Check", project: "Highway Bridge", status: "Pending", timestamp: Date.now() - 7200000 },
+                { activity: "Design Review", project: "Eco Village", status: "Completed", timestamp: Date.now() - 10800000 },
+                { activity: "Budget Approval", project: "Shopping Mall", status: "Pending", timestamp: Date.now() - 14400000 }
+            ],
+            monthlySpending: [0.5, 0.7, 0.4, 0.9, 0.6, 0.8, 1.2, 0.9, 1.1, 0.8, 0.7, 1.0]
+        };
+
+        // Performance optimization variables
+        let currentProjectId = null;
+        let charts = {};
+        let isLoading = false;
+        
+        // Debounce utility for better performance
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        };
+
+        // Throttle utility for scroll events
+        const throttle = (func, limit) => {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        };
+
+        // Chart colors - Dark mode only
+        const chartColors = {
+            primary: '#6366f1',
+            secondary: '#22d3ee', 
+            accent: '#c084fc',
+            info: '#fb923c',
+            warning: '#ef4444',
+            background: ['rgba(99, 102, 241, 0.8)', 'rgba(34, 211, 238, 0.8)', 'rgba(192, 132, 252, 0.8)', 'rgba(251, 146, 60, 0.8)'],
+            border: ['#6366f1', '#22d3ee', '#c084fc', '#fb923c'],
+            gridColor: 'rgba(59, 59, 92, 0.3)',
+            textColor: '#c7d2fe'
+        };
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const breadcrumb = document.getElementById('breadcrumb');
+        const projectModalTitle = document.getElementById('projectModalTitle');
+        const projectSubmitBtn = document.getElementById('projectSubmitBtn');
+
+        // Initialize - Enhanced for Weather App Theme
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeNavigation();
+            populateActivityFeed();
+            animateDashboardValues();
+            startRealTimeUpdates();
+            optimizeForDevice();
+            showWelcomeMessage();
+        });
+
+        function showWelcomeMessage() {
+            setTimeout(() => {
+                showNotification('Welcome to BuildCorp Dashboard! 🏗️', 'success');
+            }, 1000);
+        }
+
+        // Enhanced Navigation with smooth transitions
+        function initializeNavigation() {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', debounce((e) => {
+                    e.preventDefault();
+                    
+                    if (isLoading) return;
+                    
+                    const section = link.getAttribute('data-section');
+                    showSection(section);
+                    updateBreadcrumb(link.textContent.trim());
+                    
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('show');
+                    }
+                }, 100));
+            });
+        }
+
+        function showSection(sectionName) {
+            isLoading = true;
+            
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                const target = document.getElementById(`${sectionName}-section`);
+                if (target) {
+                    target.style.display = 'block';
+                    
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                    
+                    requestAnimationFrame(() => {
+                        target.classList.add('active');
+                        
+                        // Load section-specific content
+                        loadSectionData(sectionName, target);
+                        isLoading = false;
+                    });
+                }
+            }, 200);
+        }
+
+        function updateBreadcrumb(sectionName) {
+            breadcrumb.textContent = `BuildCorp / ${sectionName}`;
+        }
+
+        // Load section data when switching to sections
+        function loadSectionData(sectionName, section) {
+            switch (sectionName) {
+                case 'projects':
+                    if (!section.dataset.loaded) {
+                        populateProjectsTable();
+                        section.dataset.loaded = 'true';
+                    }
+                    break;
+                case 'team':
+                    if (!section.dataset.loaded) {
+                        populateTeamGrid();
+                        section.dataset.loaded = 'true';
+                    }
+                    break;
+                case 'analytics':
+                    if (!section.dataset.loaded) {
+                        setTimeout(() => initializeCharts(), 100);
+                        section.dataset.loaded = 'true';
+                    }
+                    break;
+            }
+        }
+
+        // Enhanced chart initialization - Fixed for analytics section
+        function initializeCharts() {
+            const isMobile = window.innerWidth <= 768;
+            const isLowEnd = navigator.hardwareConcurrency <= 4;
+            
+            const baseChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: isLowEnd ? false : {
+                    duration: isMobile ? 800 : 1200,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartColors.textColor,
+                            font: {
+                                family: 'Inter',
+                                size: isMobile ? 11 : 13,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(37, 37, 64, 0.9)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#c7d2fe',
+                        borderColor: chartColors.primary,
+                        borderWidth: 1,
+                        cornerRadius: 12,
+                        titleFont: {
+                            family: 'Inter',
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            family: 'Inter'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            };
+
+            // Progress Bar Chart
+            const progressContainer = document.getElementById('progressChartContainer');
+            const progressCtx = document.getElementById('progressChart');
+            
+            if (progressCtx && !charts.progress) {
+                progressContainer.classList.add('loading');
+                
+                setTimeout(() => {
+                    charts.progress = new Chart(progressCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.projects.map(p => p.name),
+                            datasets: [{
+                                label: 'Progress (%)',
+                                data: data.projects.map(p => p.progress),
+                                backgroundColor: chartColors.background,
+                                borderColor: chartColors.border,
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false,
+                            }]
+                        },
+                        options: {
+                            ...baseChartOptions,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    grid: {
+                                        color: chartColors.gridColor,
+                                        lineWidth: 1
+                                    },
+                                    ticks: {
+                                        color: chartColors.textColor,
+                                        font: {
+                                            family: 'Inter',
+                                            size: isMobile ? 10 : 12
+                                        },
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: chartColors.textColor,
+                                        font: {
+                                            family: 'Inter',
+                                            size: isMobile ? 10 : 12
+                                        },
+                                        maxRotation: isMobile ? 45 : 0
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    progressContainer.classList.remove('loading');
+                }, 300);
+            }
+
+            // Budget Pie Chart
+            const budgetContainer = document.getElementById('budgetChartContainer');
+            const budgetCtx = document.getElementById('budgetChart');
+            
+            if (budgetCtx && !charts.budget) {
+                budgetContainer.classList.add('loading');
+                
+                setTimeout(() => {
+                    charts.budget = new Chart(budgetCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.projects.map(p => p.name),
+                            datasets: [{
+                                label: 'Budget ($)',
+                                data: data.projects.map(p => p.budget),
+                                backgroundColor: chartColors.background,
+                                borderColor: chartColors.border,
+                                borderWidth: 2,
+                                hoverOffset: isMobile ? 8 : 12
+                            }]
+                        },
+                        options: {
+                            ...baseChartOptions,
+                            plugins: {
+                                ...baseChartOptions.plugins,
+                                legend: {
+                                    ...baseChartOptions.plugins.legend,
+                                    position: 'bottom',
+                                    labels: {
+                                        ...baseChartOptions.plugins.legend.labels,
+                                        padding: isMobile ? 15 : 20,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    budgetContainer.classList.remove('loading');
+                }, 600);
+            }
+
+            // Monthly Spending Line Chart - FIXED
+            const monthlyContainer = document.getElementById('monthlyChartContainer');
+            const monthlyCtx = document.getElementById('monthlyChart');
+
+            if (monthlyCtx && !charts.monthly) {
+                monthlyContainer.classList.add('loading');
+                
+                setTimeout(() => {
+                    charts.monthly = new Chart(monthlyCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                            datasets: [{
+                                label: 'Monthly Spending ($M)',
+                                data: data.monthlySpending,
+                                backgroundColor: chartColors.background[0],
+                                borderColor: chartColors.border[0],
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: chartColors.border[0],
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: isMobile ? 5 : 7,
+                                pointHoverRadius: isMobile ? 7 : 9,
+                                pointHoverBackgroundColor: chartColors.border[0],
+                                pointHoverBorderColor: '#ffffff',
+                                pointHoverBorderWidth: 3
+                            }]
+                        },
+                        options: {
+                            ...baseChartOptions,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: chartColors.gridColor,
+                                        lineWidth: 1
+                                    },
+                                    ticks: {
+                                        color: chartColors.textColor,
+                                        font: {
+                                            family: 'Inter',
+                                            size: isMobile ? 10 : 12
+                                        },
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: chartColors.gridColor,
+                                        lineWidth: 1
+                                    },
+                                    ticks: {
+                                        color: chartColors.textColor,
+                                        font: {
+                                            family: 'Inter',
+                                            size: isMobile ? 10 : 12
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    monthlyContainer.classList.remove('loading');
+                }, 900);
+            }
+        }
+
+        // Data population functions
+        function populateProjectsTable() {
+            const tbody = document.getElementById('projectsTable');
+            if (!tbody) return;
+            
+            const fragment = document.createDocumentFragment();
+            
+            data.projects.forEach(project => {
+                const tr = document.createElement('tr');
+                const statusClass = project.status.toLowerCase().replace(' ', '');
+                
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight: 600; color: var(--text-primary);">${project.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">ID: #${project.id}</div>
+                    </td>
+                    <td><span class="status-badge status-${statusClass}">${project.status}</span></td>
+                    <td>
+                        <div class="progress-header" style="margin-bottom: 8px;">
+                            <span class="progress-value">${project.progress}%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${project.progress}%"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600; color: var(--text-primary);">${project.budget.toLocaleString()}</div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm" style="background: var(--success-green); color: white; border-radius: 6px; padding: 8px 16px; border: none;" onclick="editProject(${project.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                `;
+                fragment.appendChild(tr);
+            });
+            
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
+        }
+
+        function populateTeamGrid() {
+            const teamGrid = document.getElementById('teamGrid');
+            if (!teamGrid) return;
+            
+            const fragment = document.createDocumentFragment();
+            
+            data.team.forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'col-lg-6 col-md-12 mb-3';
+                div.innerHTML = `
+                    <div class="stat-card text-center">
+                        <div class="stat-icon" style="font-size: 4rem; margin-bottom: 16px;">${member.avatar}</div>
+                        <div class="stat-value" style="font-size: 1.5rem; margin-bottom: 8px; color: var(--text-primary);">${member.name}</div>
+                        <div class="stat-label">${member.role}</div>
+                    </div>
+                `;
+                fragment.appendChild(div);
+            });
+            
+            teamGrid.innerHTML = '';
+            teamGrid.appendChild(fragment);
+        }
+
+        function populateActivityFeed() {
+            const feed = document.getElementById('activityFeed');
+            if (!feed) return;
+            
+            const fragment = document.createDocumentFragment();
+            
+            data.activities.forEach((activity) => {
+                const div = document.createElement('div');
+                div.className = 'mb-3';
+                div.innerHTML = `
+                    <div style="padding: 20px; background: linear-gradient(135deg, var(--bg-card) 0%, var(--weather-display-bg) 100%); border-left: 4px solid var(--success-green); border-radius: var(--border-radius-sm); transition: var(--transition-fast); border: 1px solid var(--border-color); box-shadow: var(--shadow-card);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-hover)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-card)'">
+                        <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">${activity.activity}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">${activity.project}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);">${formatTimeAgo(activity.timestamp)}</span>
+                            <span class="status-badge status-${activity.status.toLowerCase()}" style="font-size: 0.75rem; padding: 6px 12px;">${activity.status}</span>
+                        </div>
+                    </div>
+                `;
+                fragment.appendChild(div);
+            });
+            
+            feed.innerHTML = '';
+            feed.appendChild(fragment);
+        }
+
+        // Enhanced real-time updates with throttling
+        function startRealTimeUpdates() {
+            let lastUpdate = performance.now();
+            
+            const update = throttle(() => {
+                const now = performance.now();
+                if (now - lastUpdate >= 30000) { // Update every 30 seconds
+                    updateLiveMetrics();
+                    lastUpdate = now;
+                }
+            }, 1000);
+            
+            // Use requestAnimationFrame for smooth updates
+            function animationLoop() {
+                update();
+                requestAnimationFrame(animationLoop);
+            }
+            
+            requestAnimationFrame(animationLoop);
+        }
+
+        function updateLiveMetrics() {
+            try {
+                const totalProjects = document.getElementById('totalProjects');
+                const totalBudget = document.getElementById('totalBudget');
+                const safetyDays = document.getElementById('safetyDays');
+                
+                // Simulate live updates with smooth animations
+                if (totalProjects && Math.random() > 0.9) {
+                    const current = parseInt(totalProjects.textContent) || 12;
+                    animateValue(totalProjects, current, current + 1, 1500);
+                }
+                
+                if (totalBudget && Math.random() > 0.85) {
+                    const current = parseFloat(totalBudget.textContent.replace('$', '').replace('M', '')) || 2.5;
+                    animateValue(totalBudget, current, current + 0.1, 1500, '$', 'M');
+                }
+                
+                if (safetyDays && Math.random() > 0.95) {
+                    const current = parseInt(safetyDays.textContent) || 120;
+                    animateValue(safetyDays, current, current + 1, 1500);
+                }
+            } catch (error) {
+                console.error('Error updating metrics:', error);
+            }
+        }
+
+        function animateDashboardValues() {
+            const counters = document.querySelectorAll('.stat-value');
+            
+            counters.forEach((counter, index) => {
+                try {
+                    const text = counter.textContent;
+                    const value = parseFloat(text.replace(/[^0-9.]/g, '')) || 0;
+                    const prefix = text.includes('$') ? '$' : '';
+                    const suffix = text.includes('M') ? 'M' : '';
+                    
+                    // Stagger animations for better visual effect
+                    setTimeout(() => {
+                        animateValue(counter, 0, value, 2000, prefix, suffix);
+                    }, index * 200);
+                } catch (error) {
+                    console.error('Error animating value:', error);
+                }
+            });
+        }
+
+        function animateValue(element, start, end, duration, prefix = '', suffix = '') {
+            const startTime = performance.now();
+            
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Enhanced easing function for smoother animation
+                const easedProgress = 1 - Math.pow(1 - progress, 4);
+                const current = start + (end - start) * easedProgress;
+                
+                if (suffix === 'M') {
+                    element.textContent = prefix + current.toFixed(1) + suffix;
+                } else {
+                    element.textContent = prefix + Math.round(current) + suffix;
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+
+        // Project Modal Functions with enhanced UX
+        function showProjectModal(mode = 'add', id = null) {
+            const modal = new bootstrap.Modal(document.getElementById('projectModal'));
+            const form = document.getElementById('projectForm');
+            
+            if (mode === 'edit' && id) {
+                const project = data.projects.find(p => p.id === id);
+                if (project) {
+                    currentProjectId = id;
+                    projectModalTitle.textContent = 'Edit Project';
+                    projectSubmitBtn.textContent = 'Save Changes';
+                    document.getElementById('projectName').value = project.name;
+                    document.getElementById('projectBudget').value = project.budget;
+                    document.getElementById('projectStatus').value = project.status;
+                    document.getElementById('projectProgress').value = project.progress;
+                }
+            } else {
+                currentProjectId = null;
+                projectModalTitle.textContent = 'Add Project';
+                projectSubmitBtn.textContent = 'Add Project';
+                form.reset();
+            }
+            
+            modal.show();
+        }
+
+        function submitProject() {
+            if (isLoading) return;
+            
+            const form = document.getElementById('projectForm');
+            const nameInput = document.getElementById('projectName');
+            const budgetInput = document.getElementById('projectBudget');
+            const statusInput = document.getElementById('projectStatus');
+            const progressInput = document.getElementById('projectProgress');
+            
+            const name = nameInput.value.trim();
+            const budget = parseInt(budgetInput.value);
+            const status = statusInput.value;
+            const progress = parseInt(progressInput.value);
+            
+            // Enhanced validation
+            if (!name || isNaN(budget) || !status || isNaN(progress)) {
+                showNotification('Please fill in all fields correctly! ⚠️', 'error');
+                return;
+            }
+            
+            if (progress < 0 || progress > 100) {
+                showNotification('Progress must be between 0 and 100! 📊', 'error');
+                return;
+            }
+            
+            isLoading = true;
+            projectSubmitBtn.classList.add('loading');
+            
+            // Simulate API call delay for better UX
+            setTimeout(() => {
+                if (currentProjectId) {
+                    // Edit existing project
+                    const project = data.projects.find(p => p.id === currentProjectId);
+                    if (project) {
+                        project.name = name;
+                        project.budget = budget;
+                        project.status = status;
+                        project.progress = progress;
+                        
+                        populateProjectsTable();
+                        updateChartsWithProject(project);
+                        showNotification('Project updated successfully! 🎉', 'success');
+                    }
+                } else {
+                    // Add new project
+                    const newProject = {
+                        id: data.projects.length + 1,
+                        name,
+                        status,
+                        progress,
+                        budget
+                    };
+                    
+                    data.projects.push(newProject);
+                    populateProjectsTable();
+                    updateChartsWithNewProject(newProject);
+                    showNotification('Project added successfully! 🚀', 'success');
+                }
+                
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('projectModal'));
+                modal.hide();
+                form.reset();
+                currentProjectId = null;
+                isLoading = false;
+                projectSubmitBtn.classList.remove('loading');
+            }, 800);
+        }
+
+        function editProject(id) {
+            showProjectModal('edit', id);
+        }
+
+        // Enhanced chart update functions
+        function updateChartsWithNewProject(newProject) {
+            if (charts.progress) {
+                charts.progress.data.labels = data.projects.map(p => p.name);
+                charts.progress.data.datasets[0].data = data.projects.map(p => p.progress);
+                
+                const bgColors = [...chartColors.background];
+                const borderColors = [...chartColors.border];
+                while (bgColors.length < charts.progress.data.labels.length) {
+                    bgColors.push(...chartColors.background);
+                    borderColors.push(...chartColors.border);
+                }
+                
+                charts.progress.data.datasets[0].backgroundColor = bgColors;
+                charts.progress.data.datasets[0].borderColor = borderColors;
+                charts.progress.update();
+            }
+
+            if (charts.budget) {
+                charts.budget.data.labels = data.projects.map(p => p.name);
+                charts.budget.data.datasets[0].data = data.projects.map(p => p.budget);
+                
+                const bgColors = [...chartColors.background];
+                const borderColors = [...chartColors.border];
+                while (bgColors.length < charts.budget.data.labels.length) {
+                    bgColors.push(...chartColors.background);
+                    borderColors.push(...chartColors.border);
+                }
+                
+                charts.budget.data.datasets[0].backgroundColor = bgColors;
+                charts.budget.data.datasets[0].borderColor = borderColors;
+                charts.budget.update();
+            }
+        }
+
+        function updateChartsWithProject(updatedProject) {
+            if (charts.progress) {
+                const index = data.projects.findIndex(p => p.id === updatedProject.id);
+                if (index !== -1) {
+                    charts.progress.data.labels[index] = updatedProject.name;
+                    charts.progress.data.datasets[0].data[index] = updatedProject.progress;
+                    charts.progress.update();
+                }
+            }
+
+            if (charts.budget) {
+                const index = data.projects.findIndex(p => p.id === updatedProject.id);
+                if (index !== -1) {
+                    charts.budget.data.labels[index] = updatedProject.name;
+                    charts.budget.data.datasets[0].data[index] = updatedProject.budget;
+                    charts.budget.update();
+                }
+            }
+        }
+
+        // Enhanced export function
+        function exportData() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const exportBtn = document.querySelector('.export-btn');
+            exportBtn.classList.add('loading');
+            
+            try {
+                const exportData = {
+                    ...data,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+                    type: 'application/json' 
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `buildcorp-data-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Data exported successfully! 📥', 'success');
+            } catch (error) {
+                console.error('Export failed:', error);
+                showNotification('Export failed. Please try again! ❌', 'error');
+            } finally {
+                setTimeout(() => {
+                    exportBtn.classList.remove('loading');
+                    isLoading = false;
+                }, 1000);
+            }
+        }
+
+        // Enhanced notification system with Weather App styling
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            
+            // Set notification style based on type
+            if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, var(--error-red), var(--warning-orange))';
+            } else if (type === 'warning') {
+                notification.style.background = 'linear-gradient(135deg, var(--warning-orange), var(--purple-accent))';
+            } else if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, var(--success-green), var(--primary-blue))';
+            }
+            
+            let iconClass = 'info-circle';
+            if (type === 'success') {
+                iconClass = 'check-circle';
+            } else if (type === 'error') {
+                iconClass = 'exclamation-triangle';
+            } else if (type === 'warning') {
+                iconClass = 'exclamation-circle';
+            }
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-${iconClass}" style="font-size: 1.2rem;"></i>
+                    <span style="font-weight: 500;">${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Device optimization
+        function optimizeForDevice() {
+            const isMobile = window.innerWidth <= 768;
+            const isLowEnd = navigator.hardwareConcurrency <= 4;
+            
+            // Reduce animations on low-end devices
+            if (isLowEnd) {
+                document.documentElement.style.setProperty('--transition-fast', 'all 0.1s ease');
+            }
+            
+            // Disable hover effects on touch devices
+            if ('ontouchstart' in window) {
+                document.body.classList.add('touch-device');
+            }
+            
+            // Optimize for mobile
+            if (isMobile) {
+                // Reduce chart point sizes
+                document.documentElement.style.setProperty('--chart-point-size', '4px');
+            }
+        }
+
+        // Utility Functions
+        function formatTimeAgo(timestamp) {
+            const diff = Date.now() - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (days > 0) {
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (hours > 0) {
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else {
+                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            }
+        }
+
+        // Enhanced window resize handler with debouncing
+        window.addEventListener('resize', debounce(() => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+            
+            // Resize charts with smooth transition
+            Object.values(charts).forEach(chart => {
+                if (chart && chart.resize) {
+                    chart.resize();
+                }
+            });
+            
+            // Re-optimize for new device size
+            optimizeForDevice();
+        }, 250));
+
+        // Enhanced keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (isLoading) return;
+            
+            if (e.altKey && e.key === 'e') {
+                e.preventDefault();
+                exportData();
+            }
+            
+            if (e.key === 'Escape') {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('show');
+                }
+                
+                // Close any open modals
+                const openModal = document.querySelector('.modal.show');
+                if (openModal) {
+                    const modal = bootstrap.Modal.getInstance(openModal);
+                    modal?.hide();
+                }
+            }
+        });
+
+        // Error boundary with user feedback
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            showNotification('An error occurred. Please refresh the page! ⚠️', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            showNotification('An error occurred. Please try again! ⚠️', 'error');
+        });
+
+        // Focus management for accessibility
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                document.body.classList.add('keyboard-navigation');
+            }
+        });
+
+        document.addEventListener('mousedown', () => {
+            document.body.classList.remove('keyboard-navigation');
+        });
+
+        // Performance monitoring
+        if (performance.mark) {
+            performance.mark('dashboard-init-start');
+            
+            window.addEventListener('load', () => {
+                performance.mark('dashboard-init-end');
+                performance.measure('dashboard-init', 'dashboard-init-start', 'dashboard-init-end');
+                
+                const measure = performance.getEntriesByName('dashboard-init')[0];
+                console.log(`Dashboard initialization took ${measure.duration.toFixed(2)}ms`);
+            });
+        }
+    </script>
+</body>
+</html>
